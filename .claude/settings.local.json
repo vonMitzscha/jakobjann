@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npx astro:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4321/admin/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4321/admin/index.html)"
+    ]
+  }
+}

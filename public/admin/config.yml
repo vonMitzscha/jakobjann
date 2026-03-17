@@ -1,0 +1,37 @@
+backend:
+  name: github
+  repo: DEIN_GITHUB_USERNAME/DEIN_REPO_NAME
+  branch: main
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+  - name: projects
+    label: Projekte
+    folder: src/content/projects
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Titel, name: title, widget: string, required: true }
+      - { label: Sichtbar, name: visible, widget: boolean, default: true }
+      - { label: Datum, name: date, widget: datetime }
+      - { label: Beschreibung, name: description, widget: text }
+      - { label: Titelbild, name: cover_image, widget: image, required: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Inhalt, name: body, widget: markdown }
+
+  - name: settings
+    label: Einstellungen
+    files:
+      - label: Allgemein
+        name: general
+        file: src/content/settings/general.yml
+        fields:
+          - { label: Seitentitel, name: site_title, widget: string }
+          - { label: Bio, name: bio, widget: text, required: false }
+          - { label: Avatar, name: avatar, widget: image, required: false }
+          - { label: Kontakt anzeigen, name: show_contact, widget: boolean, default: true }
+          - { label: Über mich anzeigen, name: show_about, widget: boolean, default: true }
