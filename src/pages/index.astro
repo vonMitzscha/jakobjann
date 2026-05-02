@@ -1,10 +1,404 @@
 ---
 ---
+<!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8"/>
-    <title>Portfolio</title>
-  </head>
-  <body>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jakob Jann – Restaurierung von Streichinstrumenten</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <style is:global>
+    /* Things Tailwind can't express */
+    html { scroll-behavior: smooth; }
+    body { overflow-x: clip; }
+
+    :root { --scroll-stop: 82vh; }
+
+    .hero-zone {
+      height: calc(200vh  - var(--scroll-stop));
+      height: calc(200dvh - var(--scroll-stop));
+    }
+    .page-wrap {
+      margin-top: calc(var(--scroll-stop) - 100vh);
+      margin-top: calc(var(--scroll-stop) - 100dvh);
+    }
+
+    /* Vertical text on Kontakt tab */
+    .kontakt-tab { writing-mode: vertical-rl; }
+
+    /* Fluid type */
+    .hero-name    { font-size: clamp(2.75rem, 10vw,  5.5rem); }
+    .hero-sub     { font-size: clamp(1rem,    2.5vw, 1.375rem); }
+    .main-heading { font-size: clamp(2rem,    5.5vw, 3.25rem); }
+
+    /* Read-more: animate between exact pixel heights — always smooth */
+    #bio-expandable {
+      overflow: hidden;
+      height: 0;
+      transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Image filter */
+    .workshop-img { filter: sepia(0.35) saturate(1.5) contrast(1.1) brightness(0.82); }
+
+    /* Email tooltip – in normal flow so it never overlaps content below */
+    #email-tooltip {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    #email-tooltip.shown {
+      opacity: 1;
+    }
+
+    /* Side images: small, spread vertically at page edges (desktop) / float in bio (mobile) */
+    .side-img {
+      float: left;
+      width: clamp(90px, 28vw, 120px);
+      margin-right: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .side-img.si-r {
+      float: right;
+      margin-right: 0;
+      margin-left: 0.75rem;
+    }
+    .side-img.si-r2 {
+      float: left;
+      margin-right: 0.75rem;
+      margin-left: 0;
+    }
+    .side-img img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    @media (min-width: 1024px) {
+      .side-img {
+        position: absolute;
+        float: none;
+        margin: 0;
+        width: clamp(90px, 10vw, 150px);
+      }
+      .side-img.si-l  { left: 0; }
+      .side-img.si-r  { right: 0; left: auto; }
+      .side-img.si-r2 { right: 0; left: auto; }
+    }
+  </style>
+</head>
+<body class="bg-brand text-white font-sans">
+
+  <!-- Noise filter: baseFrequency matches Figma size 0.5/0.5 -->
+  <svg class="hidden" aria-hidden="true">
+    <defs>
+      <filter id="noise-filter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.5 0.5" numOctaves="4" stitchTiles="stitch" />
+        <feColorMatrix type="saturate" values="0" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!--
+    Noise overlay:
+    - Figma color #7C2A0A at 29% opacity
+    - mix-blend-mode: overlay → dark on light (white text gets grain),
+      screen-like on dark bg (warm highlights on orange)
+  -->
+  <div
+    class="fixed inset-0 pointer-events-none z-[9999] opacity-[0.29] mix-blend-overlay bg-[#7C2A0A]"
+    style="filter: url('#noise-filter');"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Kontakt tab -->
+  <a
+    href="#kontakt"
+    class="kontakt-tab fixed left-0 top-1/2 -translate-y-1/2 z-[100]
+           bg-brand-box text-brand-stroke text-[1.0625rem] font-normal no-underline
+           py-5 px-3 rounded-r-[12px] border-[3px] border-l-0 border-brand-stroke
+           hover:opacity-80 transition-opacity"
+  >Kontakt</a>
+
+  <!-- ── Hero ── -->
+  <div class="hero-zone">
+    <section class="sticky top-0 h-screen flex items-center justify-center p-8">
+      <div class="flex flex-col items-center text-center">
+        <img
+          src="/logo.svg"
+          alt="Logo Jakob Jann"
+          class="w-auto mb-9"
+          style="height: clamp(160px, 28vh, 260px);"
+        />
+        <h1 class="hero-name font-serif font-normal tracking-wide mb-2">Jakob Jann</h1>
+        <p class="hero-sub leading-relaxed text-white/90">
+          Restaurierung von<br />Streichinstrumenten
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── Page content ── -->
+  <div class="page-wrap relative z-10 bg-brand pt-8">
+
+    <!-- Note box -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 mb-10">
+      <div class="bg-brand-box border-[3px] border-brand-stroke rounded-[20px] px-6 py-5 text-brand-stroke">
+        <div class="flex items-center gap-2 mb-2">
+          <span aria-hidden="true">☀️</span>
+          <strong class="font-bold text-[1.0625rem]">Urlaub</strong>
+        </div>
+        <p class="text-[1.0625rem] leading-[1.75]">
+          Vom 23.05.2027 bis 23.06.2027 ist meine Werkstatt geschlossen.
+          Per E-Mail bin ich weiterhin für Sie erreichbar. Einen schönen Sommer!
+        </p>
+      </div>
+    </div>
+
+    <!-- Heading – wider column -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 mb-5">
+      <h2 class="main-heading font-serif font-normal leading-[1.15] tracking-tight">
+        Verantwortung für Klang, Substanz und Geschichte.
+      </h2>
+    </div>
+
+    <!-- Biography with full-height side images -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 mb-12">
+
+      <!-- Side images: float in bio on mobile, pinned at page edges on desktop -->
+      <div class="side-img si-l" data-speed="0.12" data-rotate="-4" style="top: 1rem;">
+        <img src="/images/werkzeug.png" alt="Restaurierungswerkzeug" />
+      </div>
+      <div class="side-img si-r" data-speed="0.08" data-rotate="5" style="top: 14rem;">
+        <img src="/images/schecke.png" alt="Schnecke einer Violine" />
+      </div>
+      <div class="side-img si-r si-r2" data-speed="0.15" data-rotate="3" style="top: 30rem;">
+        <img src="/images/steg.png" alt="Violinsteg" />
+      </div>
+
+      <p class="text-[1.0625rem] leading-[1.75] text-justify hyphens-auto">
+        Jakob Jann wuchs in Oberbayern auf und fand früh zur Arbeit mit Holz und Klang.
+        Fundament seiner breiten Ausbildung sind Studiengang und Meisterkurs. Seit 2010
+        arbeitete er in verschiedenen Ateliers in Deutschland, Frankreich und Österreich,
+        ehe er sich 2025 auf die Restaurierung von Streichinstrumenten in Wien
+        selbstständig machte.
+      </p>
+
+      <div id="bio-expandable" aria-hidden="true">
+        <p class="text-[1.0625rem] leading-[1.75] text-justify hyphens-auto pt-4">
+          Seither hat er eine Vielzahl historischer Instrumente restauriert – darunter
+          Violinen des 17. und 18. Jahrhunderts sowie seltene Violen und Celli aus
+          bedeutenden europäischen Werkstätten. Sein besonderes Interesse gilt der
+          Klangforschung: Wie verändern Materialien, Lacke und Konstruktionsweise den
+          Ton eines Instruments über Jahrhunderte? Diese Fragen leiten ihn bei jeder
+          Restaurierung und verbinden handwerkliche Präzision mit wissenschaftlicher
+          Neugier.
+        </p>
+      </div>
+
+      <div style="clear: both;"></div>
+
+      <button
+        id="read-more-btn"
+        class="mt-3 p-0 bg-transparent border-0 text-[1.0625rem] text-white/80
+               underline underline-offset-[3px] cursor-pointer
+               hover:text-white transition-colors"
+        aria-expanded="false"
+        aria-controls="bio-expandable"
+      >Weiterlesen</button>
+    </div>
+
+    <!-- Workshop image – 2/3 width on desktop -->
+    <!-- Drop your photo at: public/images/werkstatt.jpg -->
+    <div class="flex justify-center px-4 sm:px-6 pb-10">
+      <div class="w-full lg:w-2/3 relative rounded-[20px] overflow-hidden bg-black/10 min-h-[220px]">
+        <img
+          src="/images/werkstatt.jpg"
+          alt="Werkstatt Jakob Jann"
+          class="workshop-img w-full h-auto block"
+        />
+        <!-- Noise grain on the image -->
+        <div
+          class="absolute inset-0 pointer-events-none opacity-[0.22] bg-[#808080]"
+          style="filter: url('#noise-filter');"
+          aria-hidden="true"
+        ></div>
+        <!-- Warm colour tint -->
+        <div class="absolute inset-0 pointer-events-none bg-[rgba(160,60,10,0.2)] mix-blend-multiply"></div>
+      </div>
+    </div>
+
+    <!-- Footer buttons -->
+    <div id="kontakt" class="max-w-3xl mx-auto px-4 sm:px-6 pb-20">
+      <div class="flex justify-between">
+
+        <!-- Copy email -->
+        <div id="email-wrapper">
+          <button
+            id="copy-email-btn"
+            class="bg-brand-box text-brand-stroke border-[3px] border-brand-stroke
+                   rounded-[20px] px-5 py-2.5 text-[1.0625rem] font-normal
+                   cursor-pointer hover:opacity-80 transition-opacity"
+          >E-Mail-Adresse kopieren</button>
+        </div>
+
+        <!-- Call -->
+        <a
+          href="tel:+43XXXXXXXXX"
+          class="text-center bg-brand-box text-brand-stroke border-[3px] border-brand-stroke
+                 rounded-[20px] px-5 py-2.5 text-[1.0625rem] font-normal
+                 no-underline hover:opacity-80 transition-opacity"
+        >anrufen</a>
+
+        <!-- Share -->
+        <button
+          id="share-btn"
+          class="bg-brand-box text-brand-stroke border-[3px] border-brand-stroke
+                 rounded-[20px] px-5 py-2.5 text-[1.0625rem] font-normal
+                 cursor-pointer hover:opacity-80 transition-opacity"
+        >Seite teilen</button>
+
+      </div>
+
+      <!-- Always in flow → Impressum never overlaps -->
+      <p
+        id="email-tooltip"
+        role="tooltip"
+        class="mt-2 text-[1.0625rem] leading-snug text-brand-box"
+      >…und im E-Mail-Programm wieder einfügen.</p>
+
+      <p class="mt-6">
+        <a href="/impressum" class="text-white/60 text-sm underline underline-offset-2 hover:text-white/90 transition-colors">Impressum</a>
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    const btn        = document.getElementById('read-more-btn');
+    const expandable = document.getElementById('bio-expandable');
+    let open = false;
+
+    btn.addEventListener('click', () => {
+      open = !open;
+
+      if (open) {
+        // Measure content height, animate to it, then release to 'auto'
+        expandable.style.height = expandable.scrollHeight + 'px';
+        expandable.addEventListener('transitionend', () => {
+          expandable.style.height = 'auto';
+        }, { once: true });
+      } else {
+        // Pin to current pixel height first (needed if height was 'auto')
+        expandable.style.height = expandable.offsetHeight + 'px';
+        // Two rAFs: first commits the pinned height, second starts the transition
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          expandable.style.height = '0px';
+        }));
+      }
+
+      expandable.setAttribute('aria-hidden', String(!open));
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Weniger lesen' : 'Weiterlesen';
+    });
+  </script>
+
+  <script>
+    const EMAIL = 'kontakt@jakobjann.at'; // ← update to real address
+
+    const emailBtn     = document.getElementById('copy-email-btn');
+    const emailWrapper = document.getElementById('email-wrapper');
+    const tooltip      = document.getElementById('email-tooltip');
+    const shareBtn     = document.getElementById('share-btn');
+
+    const canHover = window.matchMedia('(hover: hover)').matches;
+    let tooltipVisible = false;
+
+    // ── Tooltip: show on hover (desktop) ────────────────
+    if (canHover) {
+      emailWrapper.addEventListener('mouseenter', () => tooltip.classList.add('shown'));
+      emailWrapper.addEventListener('mouseleave', () => tooltip.classList.remove('shown'));
+    }
+
+    // ── Copy email ───────────────────────────────────────
+    async function copyEmail() {
+      try {
+        await navigator.clipboard.writeText(EMAIL);
+      } catch {
+        // execCommand fallback for older browsers
+        const ta = Object.assign(document.createElement('textarea'), { value: EMAIL });
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      tooltip.classList.remove('shown');
+      tooltipVisible = false;
+      const orig = emailBtn.textContent;
+      emailBtn.textContent = 'Adresse kopiert ✓';
+      setTimeout(() => { emailBtn.textContent = orig; }, 2500);
+    }
+
+    emailBtn.addEventListener('click', () => {
+      if (!canHover && !tooltipVisible) {
+        // Mobile first tap: show tooltip
+        tooltip.classList.add('shown');
+        tooltipVisible = true;
+      } else {
+        // Desktop click or mobile second tap: copy
+        copyEmail();
+      }
+    });
+
+    // Close tooltip when tapping elsewhere on mobile
+    document.addEventListener('click', (e) => {
+      if (tooltipVisible && !emailWrapper.contains(e.target)) {
+        tooltip.classList.remove('shown');
+        tooltipVisible = false;
+      }
+    });
+
+    // ── Share page ───────────────────────────────────────
+    shareBtn.addEventListener('click', async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Jakob Jann – Restaurierung von Streichinstrumenten',
+            url: location.href,
+          });
+        } catch { /* user cancelled */ }
+      } else {
+        // Fallback: copy URL
+        await navigator.clipboard.writeText(location.href);
+        const orig = shareBtn.textContent;
+        shareBtn.textContent = 'Link kopiert ✓';
+        setTimeout(() => { shareBtn.textContent = orig; }, 2500);
+      }
+    });
+  </script>
+
+  <script>
+    (function () {
+      if (!window.matchMedia('(min-width: 1024px)').matches) return;
+      const els = document.querySelectorAll('.side-img');
+      if (!els.length) return;
+      function tick() {
+        els.forEach(function (el) {
+          const speed  = parseFloat(el.dataset.speed  || '0.10');
+          const rotate = parseFloat(el.dataset.rotate || '0');
+          const rect   = el.getBoundingClientRect();
+          const mid    = rect.top + rect.height / 2 - window.innerHeight / 2;
+          el.style.transform =
+            'rotate(' + rotate + 'deg) translateY(' + (mid * speed).toFixed(2) + 'px)';
+        });
+      }
+      window.addEventListener('scroll', tick, { passive: true });
+      tick();
+    })();
+  </script>
+
+</body>
 </html>
