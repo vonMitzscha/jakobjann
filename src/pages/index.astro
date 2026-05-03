@@ -127,7 +127,7 @@
     <section class="sticky top-0 h-screen flex items-center justify-center p-8">
       <div class="flex flex-col items-center text-center">
         <img
-          src="/logo.svg"
+          src={`${import.meta.env.BASE_URL}logo.svg`}
           alt="Logo Jakob Jann"
           class="w-auto mb-9"
           style="height: clamp(160px, 28vh, 260px);"
@@ -169,13 +169,13 @@
 
       <!-- Side images: float in bio on mobile, pinned at page edges on desktop -->
       <div class="side-img si-l" data-speed="0.12" data-rotate="-4" style="top: 1rem;">
-        <img src="/images/werkzeug.png" alt="Restaurierungswerkzeug" />
+        <img src={`${import.meta.env.BASE_URL}images/werkzeug.png`} alt="Restaurierungswerkzeug" />
       </div>
       <div class="side-img si-r" data-speed="0.08" data-rotate="5" style="top: 14rem;">
-        <img src="/images/schecke.png" alt="Schnecke einer Violine" />
+        <img src={`${import.meta.env.BASE_URL}images/schecke.png`} alt="Schnecke einer Violine" />
       </div>
       <div class="side-img si-r si-r2" data-speed="0.15" data-rotate="3" style="top: 30rem;">
-        <img src="/images/steg.png" alt="Violinsteg" />
+        <img src={`${import.meta.env.BASE_URL}images/steg.png`} alt="Violinsteg" />
       </div>
 
       <p class="text-[1.0625rem] leading-[1.75] text-justify hyphens-auto">
@@ -215,7 +215,7 @@
     <div class="flex justify-center px-4 sm:px-6 pb-10">
       <div class="w-full lg:w-2/3 relative rounded-[20px] overflow-hidden bg-black/10 min-h-[220px]">
         <img
-          src="/images/werkstatt.jpg"
+          src={`${import.meta.env.BASE_URL}images/werkstatt.jpg`}
           alt="Werkstatt Jakob Jann"
           class="workshop-img w-full h-auto block"
         />
@@ -270,7 +270,7 @@
       >…und im E-Mail-Programm wieder einfügen.</p>
 
       <p class="mt-6">
-        <a href="/impressum" class="text-white/60 text-sm underline underline-offset-2 hover:text-white/90 transition-colors">Impressum</a>
+        <a href={`${import.meta.env.BASE_URL}impressum`} class="text-white/60 text-sm underline underline-offset-2 hover:text-white/90 transition-colors">Impressum</a>
       </p>
     </div>
 
