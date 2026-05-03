@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   site: 'https://vonmitzscha.github.io',
-  base: process.env.GITHUB_ACTIONS ? '/jakobjann' : '/',
+  base: process.env.GITHUB_ACTIONS ? '/jakobjann/' : '/',
   integrations: [tailwind()],
   output: 'static',
   outDir: './dist',
