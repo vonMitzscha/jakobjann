@@ -1,0 +1,235 @@
+---
+export interface CollageImage {
+  src: string;
+  alt: string;
+  priority?: boolean;
+}
+
+interface Props {
+  images: CollageImage[];
+  class?: string;
+  showSlider?: boolean;
+}
+
+const { images, class: className = '', showSlider = false } = Astro.props;
+
+const priority = images.find(img => img.priority) ?? images[0];
+const others   = images.filter(img => img !== priority);
+---
+
+<div
+  class:list={['photo-collage', className]}
+  role="group"
+  aria-label="Bildcollage"
+>
+  <div class="collage-stage">
+    <div class="coll-card coll-priority" data-priority="true">
+      <img src={priority.src} alt={priority.alt} draggable="false" loading="eager" />
+    </div>
+    {others.map(img => (
+      <div class="coll-card" data-priority="false">
+        <img src={img.src} alt={img.alt} draggable="false" loading="lazy" />
+      </div>
+    ))}
+  </div>
+
+  {showSlider && (
+    <div class="collage-debug">
+      <label>
+        <span>Kollisionsradius: <strong class="debug-val">{DEFAULT_RADIUS}</strong></span>
+        <input
+          class="debug-slider"
+          type="range"
+          min="0.05"
+          max="1.20"
+          step="0.01"
+          value={DEFAULT_RADIUS}
+        />
+      </label>
+    </div>
+  )}
+</div>
+
+<style>
+  .photo-collage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem max(0.5rem, 1.5vw) 2rem;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .photo-collage.is-ready { opacity: 1; }
+
+  .collage-stage {
+    position: relative;
+    width: min(520px, 90vw);
+  }
+
+  .coll-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+    transition: left 0.25s ease, top 0.25s ease;
+  }
+
+  .coll-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .coll-card:not(.coll-priority) {
+    width: 46%;
+    z-index: 2;
+  }
+
+  .coll-priority {
+    width: 60%;
+    z-index: 10;
+    box-shadow: 0 12px 44px rgba(0, 0, 0, 0.32);
+  }
+
+  /* ── Debug slider ── */
+  .collage-debug {
+    margin-top: 1.5rem;
+    font-size: 0.8125rem;
+    opacity: 0.65;
+    text-align: center;
+  }
+  .collage-debug label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: default;
+  }
+  .collage-debug input[type="range"] {
+    width: 220px;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+// @ts-nocheck
+import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force';
+
+function layoutCollage(root) {
+  const stage  = root.querySelector('.collage-stage');
+  const cards  = [...root.querySelectorAll('.coll-card')];
+  const imgs   = cards.map(c => c.querySelector('img'));
+  const slider = root.querySelector('.debug-slider');
+  const valEl  = root.querySelector('.debug-val');
+
+  Promise.all(
+    imgs.map(img =>
+      img.complete && img.naturalHeight > 0
+        ? Promise.resolve()
+        : new Promise(res => {
+            img.addEventListener('load',  res, { once: true });
+            img.addEventListener('error', res, { once: true });
+          })
+    )
+  ).then(() => {
+    const stageW = stage.offsetWidth;
+    const cx = stageW / 2;
+
+    /*
+      Responsive collision radius — tuned values from interactive testing:
+      desktop ≥ 640 px → 0.65
+      mobile  < 640 px → 0.50
+    */
+    const defaultRadius = window.innerWidth >= 640 ? 0.65 : 0.50;
+
+    /*
+      Initial positions: evenly distributed around the clock + per-load
+      random jitter. Every page load → different starting angles → different
+      simulation equilibrium → unique arrangement each visit.
+
+      For N secondary images the base angles are spaced 360°/N apart, so
+      the layout scales gracefully to any number of images.
+    */
+    const secCards = cards.filter(c => c.dataset.priority === 'false');
+    const N = secCards.length;
+    let si = 0;
+
+    // baseNodes holds the randomly-seeded starting positions.
+    // runSimulation() clones from here so the slider can re-run
+    // with the same seed but a different radius.
+    const baseNodes = cards.map(el => {
+      const isPriority = el.dataset.priority === 'true';
+      const w = el.offsetWidth;
+      const h = el.offsetHeight || w * 1.5;
+
+      let x = cx, y = 0;
+      if (!isPriority) {
+        const baseAngle = N > 1 ? (2 * Math.PI * si) / N : Math.PI * 0.75;
+        const jitter    = (Math.random() - 0.5) * Math.PI * 0.8;  // ±72°
+        const nudge     = 50 + Math.random() * 60;
+        x = cx + Math.cos(baseAngle + jitter) * nudge;
+        y =      Math.sin(baseAngle + jitter) * nudge;
+        si++;
+      }
+      return { el, isPriority, w, h, x, y };
+    });
+
+    const priH = baseNodes.find(n => n.isPriority).h;
+    const cy   = priH / 2;
+    baseNodes.forEach(n => { n.y += cy; });
+
+    function runSimulation(radiusMult) {
+      const nodes = baseNodes.map(n => ({ ...n }));   // clone → fresh start
+
+      forceSimulation(nodes)
+        .force('x',       forceX(cx).strength(n => n.isPriority ? 0.9 : 0.06))
+        .force('y',       forceY(cy).strength(n => n.isPriority ? 0.9 : 0.06))
+        .force('collide', forceCollide(n => Math.min(n.w, n.h) * radiusMult))
+        .stop()
+        .tick(300);
+
+      let x0 =  Infinity, y0 =  Infinity;
+      let x1 = -Infinity, y1 = -Infinity;
+      nodes.forEach(({ x, y, w, h }) => {
+        x0 = Math.min(x0, x - w / 2);
+        y0 = Math.min(y0, y - h / 2);
+        x1 = Math.max(x1, x + w / 2);
+        y1 = Math.max(y1, y + h / 2);
+      });
+
+      const pad = 20;
+      const dx  = cx - (x0 + x1) / 2;
+      const dy  = -y0 + pad;
+
+      stage.style.height = `${y1 - y0 + pad * 2}px`;
+      nodes.forEach(n => {
+        n.el.style.left = `${n.x - n.w / 2 + dx}px`;
+        n.el.style.top  = `${n.y - n.h / 2 + dy}px`;
+      });
+    }
+
+    runSimulation(defaultRadius);
+    root.classList.add('is-ready');
+
+    // Slider (only present when showSlider prop is true)
+    if (slider) {
+      slider.value = defaultRadius;
+      if (valEl) valEl.textContent = defaultRadius.toFixed(2);
+      let raf = null;
+      slider.addEventListener('input', () => {
+        const val = parseFloat(slider.value);
+        if (valEl) valEl.textContent = val.toFixed(2);
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => runSimulation(val));
+      });
+    }
+  });
+}
+
+document.querySelectorAll('.photo-collage').forEach(layoutCollage);
+</script>

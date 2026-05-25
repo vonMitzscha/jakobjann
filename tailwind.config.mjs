@@ -5,9 +5,10 @@ export default {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#CB4D1B',
-          stroke:  '#802400',
-          box:     '#F9A887',
+          DEFAULT: '#990000',
+          stroke:  '#670000',
+          box:     '#F4D7D7',
+          parchment: '#F5EFE0',
         },
       },
       fontFamily: {
